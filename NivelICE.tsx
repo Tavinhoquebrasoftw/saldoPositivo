@@ -11,27 +11,29 @@ const icons = {
 
 const NvelIC = () => {
   return (
-    <ImageBackground source={require("../assets/NívelIC.png")} style={styles.background}>
+    <ImageBackground style={styles.background}>
+      <View style={styles.header}>
+        <TouchableOpacity onPress={() => router.back()}>
+          <Text style={styles.backArrow}>←</Text>
+        </TouchableOpacity>
+        <Text style={styles.headerTitle}>conceitos</Text>
+      </View>
+
       <ScrollView contentContainerStyle={styles.container}>
         <Card
           icon={icons.conceitos}
-          text="Conceitos"
+          text="INPC - Índice nacional de preços ao consumidor"
           onPress={() => router.push("/Resumos/Gestao/ResConceitos")}
         />
         <Card
           icon={icons.cartao}
-          text="Cartão?\nComo ter?"
+          text="Consórcio"
           onPress={() => router.push("/Resumos/Gestao/Rescard")}
         />
         <Card
           icon={icons.carro}
-          text="Automóvel?"
+          text="Gestão"
           onPress={() => router.push("/Resumos/Gestao/ResAuto")}
-        />
-        <Card
-          icon={icons.casa}
-          text="Imóveis?\nAprenda!"
-          onPress={() => router.push("/Resumos/Gestao/ResImovel")}
         />
       </ScrollView>
     </ImageBackground>
@@ -52,9 +54,26 @@ const Card = ({ icon, text, onPress }) => (
 const styles = StyleSheet.create({
   background: {
     flex: 1,
-    resizeMode: "cover",
-	width: "100%",
-	height: "100%",
+    backgroundColor: "#001E57",
+  },
+  header: {
+    backgroundColor: "#29BF12",
+    paddingTop: 50,
+    paddingBottom: 16,
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    alignItems: "center",
+  },
+  backArrow: {
+    color: "#fff",
+    fontSize: 24,
+    marginRight: 12,
+  },
+  headerTitle: {
+    color: "#fff",
+    fontSize: 18,
+    fontWeight: "bold",
+    textTransform: "lowercase",
   },
   container: {
     paddingVertical: 30,
@@ -62,9 +81,9 @@ const styles = StyleSheet.create({
     gap: 20,
   },
   card: {
-    backgroundColor: "#001e57",
-    borderRadius: 20,
-    elevation: 6,
+    backgroundColor: "#002E73",
+    borderRadius: 12,
+    elevation: 4,
     shadowColor: "#000",
     shadowOpacity: 0.2,
     shadowOffset: { width: 0, height: 4 },
@@ -76,22 +95,23 @@ const styles = StyleSheet.create({
     padding: 16,
   },
   iconContainer: {
-    backgroundColor: "rgba(104, 255, 114, 0.78)",
-    borderRadius: 16,
+    backgroundColor: "#F5A623",
+    borderRadius: 8,
     padding: 10,
     marginRight: 16,
   },
   icon: {
-    width: 50,
-    height: 50,
+    width: 30,
+    height: 30,
   },
   cardText: {
-    color: "#f5f5f5",
-    fontSize: 18,
-    fontWeight: "bold",
+    color: "#fff",
+    fontSize: 16,
     flexShrink: 1,
   },
 });
 
 export default NvelIC;
 
+
+//Falta colocar o header 
