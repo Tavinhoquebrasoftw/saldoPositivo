@@ -1,121 +1,268 @@
-
-import React from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-  ImageBackground,
-} from "react-native";
-import { Ionicons } from "@expo/vector-icons";
-import { useRouter } from "expo-router";
+import { View, Text, ActivityIndicator, Image, TouchableOpacity, StyleSheet, ScrollView } from 'react-native';
+import { useState, useEffect } from 'react';
+import { supabase } from '../../lib/supabase';
+import ProfilePictureUpload from '../funcaoP';
+import { Ionicons } from '@expo/vector-icons';
+import { router } from 'expo-router';
 
 export default function Perfil() {
-  const router = useRouter();
+  const [userId, setUserId] = useState<string | null>(null);
+  const [nome, setNome] = useState<string | null>(null);
+  const [email, setEmail] = useState<string | null>(null);
+  const [avatarUrl, setAvatarUrl] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  const fetchProfilePictureUrl = async (path: string) => {
+    if (!path) return null;
+    const { data } = supabase.storage.from('files').getPublicUrl(path);
+    return data?.publicUrl || null;
+  };
+
+  const fetchUserData = async () => {
+    try {
+      setLoading(true);
+
+      const { data: { user }, error } = await supabase.auth.getUser();
+      if (error || !user) {
+        console.error('Erro ao obter usuário:', error);
+        return;
+      }
+
+      setNome(user.user_metadata?.name || 'Usuário');
+      setEmail(user.email || 'Não informado');
+      setUserId(user.id);
+
+      const { data: profileData, error: profileError } = await supabase
+        .from('users')
+        .select('profile_pictures')
+        .eq('id', user.id)
+        .single();
+
+      if (profileError) {
+        console.error('Erro ao buscar avatar:', profileError);
+      } else if (profileData?.profile_pictures) {
+        const publicUrl = await fetchProfilePictureUrl(profileData.profile_pictures);
+        setAvatarUrl(publicUrl);
+      }
+    } catch (error) {
+      console.error('Erro ao buscar usuário:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    fetchUserData();
+
+    const { data: authListener } = supabase.auth.onAuthStateChange((event, session) => {
+      if (session?.user) {
+        setUserId(session.user.id);
+        setNome(session.user.user_metadata?.name || 'users');
+        setEmail(session.user.email || 'Não informado');
+        fetchUserData();
+      } else {
+        setUserId(null);
+        setNome(null);
+        setEmail(null);
+        setAvatarUrl(null);
+      }
+    });
+
+    return () => authListener?.subscription.unsubscribe();
+  }, []);
+
+  const handleLogout = async () => {
+    try {
+      const { error } = await supabase.auth.signOut();
+      if (error) throw error;
+    } catch (error) {
+      console.error('Erro ao fazer logout:', error);
+    }
+  };
+
+  if (loading) {
+    return (
+      <View style={styles.container2}>
+        <View style={styles.loaderContainer}>
+          <ActivityIndicator size="large" color="#00C20D" />
+        </View>
+      </View>
+    );
+  }
+
+  if (!userId) {
+    return (
+      <View style={styles.container}>
+        <Text style={styles.loginMessage}>Por favor, faça login para acessar seu perfil</Text>
+      </View>
+    );
+  }
 
   return (
-    <ImageBackground
-      source={require("../assets/Editar Perfil.png")}
-      style={styles.background}
-      resizeMode="cover"
-    >
-      {/* Botão de voltar */}
-      <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back" size={24} color="#fff" />
-      </TouchableOpacity>
+    <ScrollView style={styles.container}>
+      <View style={styles.profileHeader}>
+        {avatarUrl ? (
+          <Image
+            source={{ uri: avatarUrl }}
+            style={styles.profileImage}
+          />
+        ) : (
+          <View style={styles.profileImagePlaceholder}>
+            <Ionicons name="person" size={60} color="#00C20D" />
+          </View>
+        )}
+        
+        <ProfilePictureUpload userId={userId} onUpload={fetchUserData} />
+        
+        <Text style={styles.userName}>{nome}</Text>
+        <Text style={styles.userEmail}>{email}</Text>
+      </View>
 
-      {/* Conteúdo */}
-      <View style={styles.content}>
-        {/* Foto de perfil */}
-        <View style={styles.profileContainer}>
-          <Ionicons name="person-circle-outline" size={100} color="#fff" />
-          <Text style={styles.changePhotoText}>Mudar foto</Text>
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Minha conta</Text>
+        
+        <View style={styles.menuItem}>
+          <Ionicons name="person-circle" size={24} color="#00C20D" />
+          <View style={styles.infoContainer}>
+            <Text style={styles.menuItemText}>Informações pessoais</Text>
+            <Text style={styles.emailText}>{email}</Text>
+          </View>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </View>
-
-        {/* Campo Nome */}
-        <Text style={styles.label}>Nome</Text>
-        <TextInput style={styles.input} value="Erick" />
-
-        {/* Campo Senha */}
-        <Text style={styles.label}>Senha</Text>
-        <TextInput style={styles.input} secureTextEntry value="*******" />
-
-        {/* Botões */}
-        <TouchableOpacity style={styles.saveButton}>
-          <Text style={styles.buttonText}>Alterar Perfil</Text>
-        </TouchableOpacity>
-
-        <TouchableOpacity style={styles.deleteButton}>
-          <Text style={styles.buttonText}>Excluir conta</Text>
+        
+        <TouchableOpacity style={styles.menuItem} onPress={()=> router.push('recSsenha/nova-senha')}>
+          <Ionicons name="lock-closed" size={24} color="#00C20D" />
+          <Text style={styles.menuItemText}>Mudar senha</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
         </TouchableOpacity>
       </View>
-    </ImageBackground>
+
+      <View style={styles.section}>
+        <Text style={styles.sectionTitle}>Configurações</Text>
+        
+        <View style={styles.menuItem}>
+          <Ionicons name="notifications" size={24} color="#00C20D" />
+          <Text style={styles.menuItemText}>Notificações</Text>
+          <Ionicons name="chevron-forward" size={20} color="#999" />
+        </View>
+      </View>
+
+      <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
+        <Text style={styles.logoutButtonText}>Sair da conta</Text>
+      </TouchableOpacity>
+    </ScrollView>
   );
 }
 
 const styles = StyleSheet.create({
-  background: {
+  container: {
     flex: 1,
-    width: "100%",
-    height: "100%",
+    backgroundColor: '#001E57',
   },
-  backButton: {
-    position: "absolute",
-    top: 40,
-    left: 20,
-    zIndex: 10,
-  },
-  content: {
+  container2: {
     flex: 1,
+    backgroundColor: "#001e3c",
+    justifyContent: "center",
     alignItems: "center",
-    paddingTop: 100,
   },
-  profileContainer: {
-    alignItems: "center",
-    marginBottom: 30,
+  loaderContainer: {
+    backgroundColor: "#002b57",
+    padding: 20,
+    borderRadius: 20,
   },
-  changePhotoText: {
-    color: "#fff",
-    fontSize: 14,
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f8f9fa',
+  },
+  loginMessage: {
+    fontSize: 16,
+    color: '#333',
+  },
+  profileHeader: {
+    alignItems: 'center',
+    paddingVertical: 30,
+    backgroundColor: '#001E57',
+    marginBottom: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  profileImage: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    marginBottom: 15,
+    borderWidth: 3,
+    borderColor: '#00C20D',
+  },
+  profileImagePlaceholder: {
+    width: 120,
+    height: 120,
+    borderRadius: 60,
+    backgroundColor: '#eee',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 15,
+    borderWidth: 3,
+    borderColor: '#00C20D',
+  },
+  userName: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: 'white',
+    marginTop: 10,
+  },
+  userEmail: {
+    fontSize: 16,
+    color: '#ccc',
     marginTop: 5,
   },
-  label: {
-    color: "#fff",
-    fontWeight: "bold",
-    alignSelf: "flex-start",
-    marginLeft: 40,
-    marginTop: 20,
-    fontSize: 16,
-  },
-  input: {
-    width: "80%",
-    backgroundColor: "#fff",
-    padding: 10,
+  section: {
+    backgroundColor: 'white',
+    marginBottom: 15,
+    marginHorizontal: 15,
+    paddingHorizontal: 20,
     borderRadius: 10,
-    alignSelf: "center",
-    marginTop: 5,
+  },
+  sectionTitle: {
     fontSize: 16,
+    fontWeight: 'bold',
+    color: '#00C20D',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  saveButton: {
-    backgroundColor: "green",
-    padding: 12,
-    borderRadius: 25,
-    width: "80%",
-    alignItems: "center",
-    marginTop: 30,
+  menuItem: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingVertical: 15,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
   },
-  deleteButton: {
-    backgroundColor: "red",
-    padding: 12,
-    borderRadius: 25,
-    width: "80%",
-    alignItems: "center",
-    marginTop: 15,
+  infoContainer: {
+    flex: 1,
+    marginLeft: 15,
   },
-  buttonText: {
-    color: "#fff",
-    fontWeight: "bold",
+  menuItemText: {
     fontSize: 16,
+    color: '#333',
+  },
+  emailText: {
+    fontSize: 14,
+    color: '#666',
+    marginTop: 3,
+  },
+  logoutButton: {
+    margin: 20,
+    padding: 15,
+    backgroundColor: 'red',
+    borderRadius: 8,
+    alignItems: 'center',
+  },
+  logoutButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: 'bold',
   },
 });
