@@ -1,6 +1,7 @@
 import { router } from "expo-router";
 import React from "react";
 import { StyleSheet, View, Image, Text, TouchableOpacity, ImageBackground, ScrollView } from "react-native";
+import Ionicons from '@expo/vector-icons/Ionicons';
 
 const icons = {
   conceitos: require("../assets/maoDollar.png"),
@@ -14,7 +15,8 @@ const NvelIC = () => {
     <ImageBackground style={styles.background}>
       <View style={styles.header}>
         <TouchableOpacity onPress={() => router.back()}>
-          <Text style={styles.backArrow}>←</Text>
+           <Ionicons name="arrow-back-outline" size={20} color="white" style={{marginRight:15}} />
+          {/* <Text style={styles.backArrow}>←</Text> */}
         </TouchableOpacity>
         <Text style={styles.headerTitle}>conceitos</Text>
       </View>
@@ -57,23 +59,23 @@ const styles = StyleSheet.create({
     backgroundColor: "#001E57",
   },
   header: {
-    backgroundColor: "#29BF12",
-    paddingTop: 50,
-    paddingBottom: 16,
-    paddingHorizontal: 16,
-    flexDirection: "row",
-    alignItems: "center",
+   height: 60,
+    backgroundColor: '#00C20D',
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+    paddingHorizontal: 15,
   },
   backArrow: {
-    color: "#fff",
-    fontSize: 24,
-    marginRight: 12,
+    color: 'white',
+    fontSize: 10,
+    marginRight: 6,
   },
   headerTitle: {
-    color: "#fff",
-    fontSize: 18,
-    fontWeight: "bold",
-    textTransform: "lowercase",
+     color: 'white',
+    // fontWeight: 'bold',
+    fontSize: 14,
+    lineHeight: 18,
   },
   container: {
     paddingVertical: 30,
