@@ -24,19 +24,7 @@ export default function EntrarSala() {
           placeholderTextColor="#B0B8D1"
         />
 
-        <Text style={styles.label}>nome da sala</Text>
-        <TextInput
-          style={styles.input}
-          value={nomeSala}
-          onChangeText={setNomeSala}
-        />
-
-        <Text style={styles.label}>participantes</Text>
-        <TextInput
-          style={styles.input}
-          value={participantes}
-          onChangeText={setParticipantes}
-        />
+      
 
         <Pressable style={styles.button}>
           <Text style={styles.buttonText}>entrar</Text>
