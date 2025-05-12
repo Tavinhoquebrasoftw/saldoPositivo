@@ -1,115 +1,174 @@
-import { useEffect, useState } from 'react';
+import React, { useState } from "react";
 import {
   View,
-  FlatList,
   Text,
   StyleSheet,
   TouchableOpacity,
-} from 'react-native';
-import { router } from 'expo-router';
-import Ionicons from '@expo/vector-icons/Ionicons';
+  Switch,
+} from "react-native";
+import { Ionicons, MaterialIcons } from "@expo/vector-icons";
 
-type Sala = { id: string; nome?: string; link?: string };
-
-export default function MinhasSalas() {
-  const [salas, setSalas] = useState<Sala[]>([]);
-
-  // useEffect(() => {
-  //   // Código para buscar salas do Supabase/Firebase
-  // }, []);
-
-  const irParaSala = (codigoSala: string) => {
-    router.push({ pathname: "/Alunos/VerSala", params: { id: codigoSala } });
-
-    if(){
-      return(
-        <View style={}>
-         <Image source={require('../assets/lupa.png')} style={{width: 100, height: 100}} />
-
-         <Text>nenhuma sala</Text>
-         <Text>adicione uma sala para que possamos te ajudar a controlar suas finanças</Text>
-         
-        </View>
-      )
-    }
-  };
+export default function PerfilView() {
+  const [notificacoesAtivadas, setNotificacoesAtivadas] = useState(true);
+  const [infoPessoaisAberto, setInfoPessoaisAberto] = useState(false);
 
   return (
     <View style={styles.container}>
-      {/* Barra superior */}
-      <View style={styles.header}>
-        <TouchableOpacity style={styles.backButton} onPress={() => router.back()}>
-        <Ionicons name="arrow-back-outline" size={24} color="white" style={{marginRight:15}} />
-          {/* <Text style={styles.backArrow}>←</Text> */}
-          <Text style={styles.headerTitle}>minhas{'\n'}salas</Text>
-        </TouchableOpacity>
+      <Text style={styles.status}>Potencial investidor</Text>
 
-        <TouchableOpacity onPress={() => {/* lógica de adicionar sala */}}>
-          <Text style={styles.headerAction}>adicionar</Text>
-        </TouchableOpacity>
+      {/* Cabeçalho com avatar e QR code */}
+      <View style={styles.profileHeader}>
+        <View style={styles.avatar}></View>
+       
       </View>
 
-      {/* Lista de salas */}
-      <FlatList
-        contentContainerStyle={styles.listContent}
-        data={salas}
-        keyExtractor={item => item.id}
-        renderItem={({ item }) => (
-          <TouchableOpacity style={styles.item} onPress={() => irParaSala(item.id)}>
-            <Text style={styles.text}>{item.nome ?? 'Sala sem nome'}</Text>
-          </TouchableOpacity>
+      <Text style={styles.userName}>Erick Magalhães Coutinho</Text>
+
+      {/* Seção: Minha Conta */}
+      <View style={styles.section}>
+      <View style={{left:5, bottom:5, color:'#fff', fontsize:'Roboto'}}>Minha conta</View>
+        <TouchableOpacity
+          style={styles.infoHeader}
+          onPress={() => setInfoPessoaisAberto(!infoPessoaisAberto)}
+        >
+          <Ionicons name="person-outline" size={22} color="#fff" />
+          <Text style={styles.infoTitle}>Informações pessoais</Text>
+          <Ionicons
+            name={infoPessoaisAberto ? "chevron-up" : "chevron-down"}
+            size={20}
+            color="#fff"
+          />
+        </TouchableOpacity>
+
+        {/* Subitens visíveis apenas se aberto */}
+        {infoPessoaisAberto && (
+          <View style={styles.subInfoContainer}>
+            <View style={styles.subInfoRow}>
+              <Text style={styles.subLabel}>Nome</Text>
+              <Text style={styles.subText}>Erick Magalhães Coutinho</Text>
+              <MaterialIcons name="edit" size={20} color="#fff" />
+            </View>
+            <View style={styles.subInfoRow}>
+              <Text style={styles.subLabel}>E-mail</Text>
+              <Text style={styles.subText}>coutinhoerick2007@gmail.com</Text>
+              <MaterialIcons name="edit" size={20} color="#fff" />
+            </View>
+          </View>
         )}
-      />
+      </View>
+
+      {/* Configurações */}
+      
+      <View style={styles.section}>
+         <View style={{left:5, bottom:5, color:'#fff', fontsize:'Roboto'}}>Configurações</View>
+         <View style={styles.subInfoContainer}>
+        <TouchableOpacity style={styles.item}>
+          <Ionicons name="lock-closed-outline" size={22} color="#fff" />
+          <Text style={styles.itemText}>Mudar senha</Text>
+        </TouchableOpacity>
+
+        <View style={styles.item}>
+          <Ionicons name="notifications-outline" size={22} color="#fff" />
+          <Text style={styles.itemText}>Notificações</Text>
+          <Switch
+            value={notificacoesAtivadas}
+            onValueChange={setNotificacoesAtivadas}
+          />
+        </View>
+
+        <TouchableOpacity style={styles.item}>
+          <Ionicons name="information-circle-outline" size={22} color="#fff" />
+          <Text style={styles.itemText}>Sobre</Text>
+        </TouchableOpacity>
+      </View>
+      </View>
+
+      {/* Navegação inferior */}
+      <View style={styles.bottomNav}>
+        <TouchableOpacity>
+          <Ionicons name="home-outline" size={24} color="#fff" />
+          <Text style={styles.navText}>Início</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Ionicons name="person-outline" size={24} color="#fff" />
+          <Text style={styles.navText}>Perfil</Text>
+        </TouchableOpacity>
+        <TouchableOpacity>
+          <Ionicons name="help-circle-outline" size={24} color="#fff" />
+          <Text style={styles.navText}>Ajuda</Text>
+        </TouchableOpacity>
+      </View>
     </View>
   );
 }
 
 const styles = StyleSheet.create({
-  container: {
-    flex: 1,
-    backgroundColor: '#001C55',
+  container: { flex: 1, backgroundColor: "#002060", paddingTop: 50 },
+  status: { color: "#fff", position: "absolute", top: 10, right: 20 },
+  profileHeader: { alignItems: "center", marginTop: 20 },
+  avatar: {
+    width: 100,
+    height: 100,
+    borderRadius: 50,
+    backgroundColor: "#f00", // Apenas cor por enquanto
   },
-  header: {
-    height: 60,
-    backgroundColor: '#00C20D',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
-    paddingHorizontal: 15,
-  },
-  backButton: {
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  backArrow: {
-    color: 'white',
-    fontSize: 18,
-    marginRight: 6,
-  },
-  headerTitle: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-    lineHeight: 18,
-  },
-  headerAction: {
-    color: 'white',
-    fontWeight: 'bold',
-    fontSize: 14,
-  },
-  listContent: {
-    padding: 20,
-  },
-  item: {
-    padding: 15,
-    borderWidth: 2,
-    borderColor: '#ccc',
+  qrButton: { position: "absolute", right: 120, top: 10 },
+  userName: { color: "#fff", fontSize: 18, textAlign: "center", marginTop: 10 },
+
+  section: { marginTop: 30, paddingHorizontal: 20 },
+  infoHeader: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    backgroundColor: "#082660",
     borderRadius: 10,
+    padding: 12,
+  },
+  infoTitle: { color: "#fff", fontSize: 16, flex: 1, marginLeft: 10 },
+
+  subInfoContainer: {
+    backgroundColor: "#082660",
+    borderBottomLeftRadius: 10,
+    borderBottomRightRadius: 10,
+    padding: 10,
+    marginTop: 5,
+    borderRadius: 10,
+    
+  },
+  subInfoRow: {
+    flexDirection: "row",
+    alignItems: "center",
     marginBottom: 10,
-    backgroundColor: '#f9f9f9',
   },
-  text: {
-    fontSize: 16,
-    color: '#000',
+  subLabel: {
+    color: "#fff",
+    width: 50,
+    fontSize: 13,
   },
+  subText: {
+    color: "#fff",
+    flex: 1,
+    fontSize: 14,
+  },
+
+  item: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    paddingVertical: 15,
+    borderBottomColor: "#ccc",
+    borderBottomWidth: 0.5,
+  },
+  itemText: { color: "#fff", flex: 1, marginLeft: 10 },
+
+  bottomNav: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    backgroundColor: "#00C20D",
+    paddingVertical: 10,
+    position: "absolute",
+    bottom: 0,
+    width: "100%",
+  },
+  navText: { color: "#fff", textAlign: "center", fontSize: 12 },
 });
