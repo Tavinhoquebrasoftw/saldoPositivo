@@ -1,5 +1,4 @@
-
-  import React, { useState } from "react";
+import React, { useState } from "react";
 import {
   View,
   Text,
@@ -159,7 +158,7 @@ const styles = StyleSheet.create({
   bottomNav: {
     flexDirection: "row",
     justifyContent: "space-around",
-    backgroundColor: "#00cc66",
+    backgroundColor: "#00C20D",
     paddingVertical: 10,
     position: "absolute",
     bottom: 0,
