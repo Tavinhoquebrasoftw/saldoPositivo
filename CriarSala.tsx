@@ -12,7 +12,7 @@ export default function EntrarSala() {
         <View style={styles.dragIndicator} />
 
         <TouchableOpacity>
-          <Text style={styles.link}>adicionar nova sala</Text>
+          <Text style={styles.link}>criar nova sala</Text>
         </TouchableOpacity>
 
         <Text style={styles.label}>código da sala</Text>
@@ -31,15 +31,8 @@ export default function EntrarSala() {
           onChangeText={setNomeSala}
         />
 
-        <Text style={styles.label}>informações</Text>
-        <TextInput
-          style={styles.input}
-          value={participantes}
-          onChangeText={setParticipantes}
-        />
-
         <Pressable style={styles.button}>
-          <Text style={styles.buttonText}>entrar</Text>
+          <Text style={styles.buttonText}>criar</Text>
         </Pressable>
       </View>
     </View>
