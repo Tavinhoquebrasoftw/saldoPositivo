@@ -20,6 +20,18 @@ export default function MinhasSalas() {
 
   const irParaSala = (codigoSala: string) => {
     router.push({ pathname: "/Alunos/VerSala", params: { id: codigoSala } });
+
+    if(){
+      return(
+        <View style={}>
+         <Image source={require('../assets/lupa.png')} style={{width: 100, height: 100}} />
+
+         <Text>nenhuma sala</Text>
+         <Text>adicione uma sala para que possamos te ajudar a controlar suas finanças</Text>
+         
+        </View>
+      )
+    }
   };
 
   return (
