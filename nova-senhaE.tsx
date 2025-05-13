@@ -1,23 +1,31 @@
 import React, { useState } from 'react';
-import { View, Alert, StyleSheet, Image, TouchableOpacity } from 'react-native';
+import { View, StyleSheet, Image, TouchableOpacity } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import Ionicons from '@expo/vector-icons/Ionicons';
 
 export default function NovaSenha() {
+  console.log('Botão salvar clicado');
+
   const [senha, setSenha] = useState('');
   const [confirmarSenha, setConfirmarSenha] = useState('');
+  const [showModal, setShowModal] = useState(false);
+  const [modalMessage, setModalMessage] = useState('');
 
-  const handleAtualizarSenha = async () => {
-    if (senha.length < 6) {
-      Alert.alert('Senha fraca', 'A senha precisa ter pelo menos 6 caracteres.');
+  const handleAtualizarSenha = () => {
+    if (senha.length !== 6) {
+      setModalMessage('A senha precisa ter exatamente 6 dígitos.');
+      setShowModal(true);
       return;
     }
+
     if (senha !== confirmarSenha) {
-      Alert.alert('Erro', 'As senhas não coincidem.');
+      setModalMessage('As senhas não coincidem.');
+      setShowModal(true);
       return;
     }
 
-    // lógica de atualização da senha aqui
+    setModalMessage('Senha alterada com sucesso.');
+    setShowModal(true);
   };
 
   return (
@@ -25,8 +33,7 @@ export default function NovaSenha() {
       {/* Topo com botão voltar e título */}
       <View style={styles.header}>
         <TouchableOpacity onPress={() => {/* lógica de voltar */}}>
-        <Ionicons name="chevron-back-sharp" size={24} color="white" />
-          {/* <Icon name="arrow-back" size={24} color="#fff" /> */}
+          <Ionicons name="chevron-back-sharp" size={24} color="white" />
         </TouchableOpacity>
         <Text style={styles.headerText}>Mudar Senha</Text>
       </View>
@@ -68,6 +75,25 @@ export default function NovaSenha() {
       >
         salvar
       </Button>
+
+      {/* Modal */}
+     {showModal && (
+  <View style={styles.modalOverlay}>
+    <View style={styles.modalContainer}>
+      <Text style={styles.modalText}>{modalMessage}</Text>
+      <Button
+        mode="contained"
+        onPress={() => setShowModal(false)}
+        buttonColor="#00C20D"
+        style={{ marginTop: 16 }}
+      >
+        OK
+      </Button>
+    </View>
+  </View>
+)}
+
+    
     </View>
   );
 }
@@ -97,7 +123,6 @@ const styles = StyleSheet.create({
     height: 300,
     marginBottom: 32,
     alignSelf: 'center',
-    
   },
   input: {
     backgroundColor: 'transparent',
@@ -109,8 +134,31 @@ const styles = StyleSheet.create({
   },
   botao: {
     marginTop: 8,
-  borderRadius: 8,
-  justifyContent: 'center',
-  
+    borderRadius: 8,
+    justifyContent: 'center',
+  },
+  modalOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 10,
+  },
+  modalContainer: {
+    backgroundColor: 'white',
+    padding: 24,
+    borderRadius: 8,
+    width: '80%',
+    alignItems: 'center',
+   
+  },
+  modalText: {
+    fontSize: 16,
+    color: '#000',
+    textAlign: 'center',
   },
 });
